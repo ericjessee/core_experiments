@@ -1,3 +1,6 @@
 [submodule "src/VerilogBoy"]
 	path = src/VerilogBoy
 	url = https://github.com/zephray/VerilogBoy.git
+[submodule "src/sm83-fpga"]
+	path = src/sm83-fpga
+	url = https://github.com/ericjessee/sm83-fpga.git
