@@ -1,0 +1,3 @@
+[submodule "src/VerilogBoy"]
+	path = src/VerilogBoy
+	url = https://github.com/zephray/VerilogBoy.git
