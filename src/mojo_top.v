@@ -27,6 +27,24 @@ assign spi_miso = 1'bz;
 assign avr_rx = 1'bz;
 assign spi_channel = 4'bzzzz;
 
-assign led = 8'b0;
+assign led = 8'h55; //alternating bit pattern
+
+//cpu core
+cpu cpu(
+    .clk(i_clk),
+    .rst(rst),
+    .phi(),
+    .ct(),
+    .a(),
+    .din(),
+    .rd(),
+    .wr(),
+    .int_en(),
+    .int_flags_in(),
+    .int_flags_out(),
+    .key_in(),
+    .done(),
+    .fault()
+);
 
 endmodule
