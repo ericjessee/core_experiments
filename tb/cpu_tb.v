@@ -5,7 +5,8 @@ reg rst;
 wire phi;
 wire [1:0] ct;
 wire [15:0] a;
-reg [7:0] din;
+wire [7:0] dout;
+wire [7:0] din;
 wire rd;
 wire wr;
 reg [4:0] int_en;
@@ -22,6 +23,7 @@ cpu cpu(
     .ct(ct),
     .a(a),
     .din(din),
+    .dout(dout),
     .rd(rd),
     .wr(wr),
     .int_en(int_en),
@@ -32,10 +34,21 @@ cpu cpu(
     .fault(fault)
 );
 
+reg rom_ena;
+
+bootrom bootrom(
+    .clka(clk),
+    .rsta(rst),
+    .ena(rom_ena),
+    .addra(a),
+    .douta(din)
+);
+
 always #10 clk=~clk;
 
 initial begin
     clk<=0;
+    rom_ena<=1;
     rst<=1;
     #50
     rst<=0;
