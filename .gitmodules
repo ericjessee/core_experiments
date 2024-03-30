@@ -4,3 +4,6 @@
 [submodule "src/sm83-fpga"]
 	path = src/sm83-fpga
 	url = https://github.com/ericjessee/sm83-fpga.git
+[submodule "mojo-loader"]
+	path = mojo-loader
+	url = https://github.com/lromor/mojo-loader.git
