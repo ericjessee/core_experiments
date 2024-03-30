@@ -3,48 +3,112 @@ module mojo_top(
     input clk,
     // Input from reset button (active low)
     input rst_n,
-    // cclk input from AVR, high when AVR is ready
-    input cclk,
     // Outputs to the 8 onboard LEDs
-    output[7:0]led,
-    // AVR SPI connections
-    output spi_miso,
-    input spi_ss,
-    input spi_mosi,
-    input spi_sck,
-    // AVR ADC channel select
-    output [3:0] spi_channel,
-    // Serial connections
-    input avr_tx, // AVR Tx => FPGA Rx
-    output avr_rx, // AVR Rx => FPGA Tx
-    input avr_rx_busy // AVR Rx buffer full
+    output [7:0]led
     );
 
 wire rst = ~rst_n; // make reset active high
 
-// these signals should be high-z when not used
-assign spi_miso = 1'bz;
-assign avr_rx = 1'bz;
-assign spi_channel = 4'bzzzz;
+//core connections
+wire clk_419;
+wire clkgen_lock;
+wire clk_fb;
 
-assign led = 8'h55; //alternating bit pattern
+clk_gen_4_19 clkgen(
+    .CLK_IN1(clk),
+    .CLK_OUT1(clk_419),
+    .RESET(rst),
+    .LOCKED(clkgen_lock)
+);
 
 //cpu core
+wire cpu_rst;
+assign cpu_rst = rst | !clkgen_lock;
+
+wire phi;
+wire [1:0] ct;
+wire [15:0] a;
+wire [7:0] dout;
+wire [7:0] din; //bus subordinates must go high-z when not being accessed.
+wire rd;
+wire wr;
+reg [4:0] int_en;
+reg [4:0] int_flags_in;
+wire [4:0] int_flags_out;
+reg [7:0] key_in;
+wire done;
+wire fault;
+
 cpu cpu(
-    .clk(i_clk),
-    .rst(rst),
-    .phi(),
-    .ct(),
-    .a(),
-    .din(),
-    .rd(),
-    .wr(),
-    .int_en(),
-    .int_flags_in(),
-    .int_flags_out(),
-    .key_in(),
-    .done(),
-    .fault()
+    .clk(clk_419),
+    .rst(cpu_rst),
+    .phi(phi),
+    .ct(ct),
+    .a(a),
+    .din(din),
+    .dout(dout),
+    .rd(rd),
+    .wr(wr),
+    .int_en(int_en),
+    .int_flags_in(int_flags_in),
+    .int_flags_out(int_flags_out),
+    .key_in(key_in),
+    .done(done),
+    .fault(fault)
 );
+
+//memory
+reg rom_en;
+rom_wrapper bootrom(
+    .clka(clk_419),
+    .rsta(cpu_rst),
+    .ena(rom_en),
+    .addra(a),
+    .douta(din)
+);
+
+reg wram1_en;
+wram_wrapper #(.BASE_ADDR(16'hc000)) wram1(
+    .clka(clk_419),
+    .rsta(cpu_rst),
+    .ena(wram1_en),
+    .wea(wr),
+    .addra(a),
+    .dina(dout),
+    .douta(din)
+);
+
+reg wram2_en;
+wram_wrapper #(.BASE_ADDR(16'hd000)) wram2(
+    .clka(clk_419),
+    .rsta(cpu_rst),
+    .ena(wram2_en),
+    .wea(wr),
+    .addra(a),
+    .dina(dout),
+    .douta(din)
+);
+
+reg[7:0] led_state;
+assign led = led_state;
+
+always @(posedge clk) begin
+    if(rst) begin
+        int_en <= 0;
+        int_flags_in <= 0;
+        wram1_en <= 0;
+        wram2_en <= 0;
+        rom_en <=0;
+        led_state <= 0;
+    end else begin
+        wram1_en <= 1;
+        wram2_en <= 1;
+        rom_en <=1;
+        if(a == 16'hffff && wr) begin
+            led_state <= dout;
+        end
+    end
+
+end
 
 endmodule
