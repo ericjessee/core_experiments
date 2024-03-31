@@ -1,11 +1,17 @@
 module mojo_top(
     // 50MHz clock input
     input clk,
+    //avr config status
+    input cclk,
     // Input from reset button (active low)
     input rst_n,
     // Outputs to the 8 onboard LEDs
-    output [7:0]led
-    );
+    output [7:0]led,
+    
+    input avr_tx, // AVR Tx => FPGA Rxz
+    output avr_rx, // AVR Rx => FPGA Tx
+    input avr_rx_busy // AVR Rx buffer full
+);
 
 wire rst = ~rst_n; // make reset active high
 
@@ -89,8 +95,23 @@ wram_wrapper #(.BASE_ADDR(16'hd000)) wram2(
     .douta(din)
 );
 
+//peripherals
 reg[7:0] led_state;
 assign led = led_state;
+
+avr_module avr_module(
+    .clk(clk_419),
+    .cclk(cclk),
+    .rst(cpu_rst),
+    .din(dout),
+    .dout(din),
+    .addr(a),
+    .wr(wr),
+    .rd(rd),
+    .avr_rx(avr_rx),
+    .avr_tx(avr_tx),
+    .avr_rx_busy(avr_rx_busy)
+);
 
 always @(posedge clk) begin
     if(rst) begin
