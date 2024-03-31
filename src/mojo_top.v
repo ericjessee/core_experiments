@@ -8,10 +8,17 @@ module mojo_top(
     // Outputs to the 8 onboard LEDs
     output [7:0]led,
     
-    input avr_tx, // AVR Tx => FPGA Rxz
+    input avr_tx, // AVR Tx => FPGA Rx
     output avr_rx, // AVR Rx => FPGA Tx
-    input avr_rx_busy // AVR Rx buffer full
+    input avr_rx_busy, // AVR Rx buffer full
+    output avr_rx_debug,
+    output avr_tx_debug,
+    output avr_rx_busy_debug
 );
+
+assign avr_rx_debug = avr_rx;
+assign avr_tx_debug = avr_tx;
+assign avr_rx_busy_debug = avr_rx_busy;
 
 wire rst = ~rst_n; // make reset active high
 
@@ -100,7 +107,7 @@ reg[7:0] led_state;
 assign led = led_state;
 
 avr_module avr_module(
-    .clk(clk_419),
+    .clk(clk),
     .cclk(cclk),
     .rst(cpu_rst),
     .din(dout),

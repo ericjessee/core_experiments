@@ -4,8 +4,8 @@ reg  clk;
 reg  cclk;
 reg  rst_n;
 wire [7:0] led;
-wire [7:0] avr_rx;
-reg  [7:0] avr_tx;
+wire fpga2avr;
+reg  avr2fpga;
 reg avr_rx_busy;
 
 mojo_top mojo_top(
@@ -13,8 +13,8 @@ mojo_top mojo_top(
     .cclk(cclk),
     .rst_n(rst_n),
     .led(led),
-    .avr_rx(avr_rx),
-    .avr_tx(avr_tx),
+    .avr_rx(fpga2avr),
+    .avr_tx(avr2fpga),
     .avr_rx_busy(avr_rx_busy)
 );
 

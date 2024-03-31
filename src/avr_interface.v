@@ -1,6 +1,6 @@
 module avr_interface #(
     parameter CLK_RATE = 50000000,
-    parameter SERIAL_BAUD_RATE = 50000
+    parameter SERIAL_BAUD_RATE = 500000
   )(
     input clk,
     input rst,
