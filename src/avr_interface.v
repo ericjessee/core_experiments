@@ -1,6 +1,6 @@
 module avr_interface #(
-    parameter CLK_RATE = 4200000,
-    parameter SERIAL_BAUD_RATE = 9600
+    parameter CLK_RATE = 50000000,
+    parameter SERIAL_BAUD_RATE = 50000
   )(
     input clk,
     input rst,
@@ -36,8 +36,9 @@ module avr_interface #(
     
     // Serial Rx User Interface
     output [7:0] rx_data,
-    output new_rx_data
-  );
+    output new_rx_data,
+    output ready
+);
   
   wire ready;
   wire n_rdy = !ready;
@@ -116,11 +117,13 @@ module avr_interface #(
     busy_d = busy_q;
     block_d = {block_q[2:0], tx_block};
 
-    if (block_q[3] ^ block_q[2])
+    if (block_q[3] ^ block_q[2]) begin
       busy_d = 1'b0;
-
-    if (!tx_busy && new_tx_data)
+    end else if (!tx_busy && new_tx_data) begin
       busy_d = 1'b1;
+    end else begin
+      busy_d = 1'b0;
+    end
     
     if (spi_ss) begin // device is not selected
       byte_ct_d = 1'b0;
