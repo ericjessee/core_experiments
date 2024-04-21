@@ -80,9 +80,6 @@
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="14"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="14"/>
     </file>
-    <file xil_pn:name="clks.ucf" xil_pn:type="FILE_UCF">
-      <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
-    </file>
     <file xil_pn:name="ipcore_dir/clk_gen_4_19.xco" xil_pn:type="FILE_COREGEN">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="16"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="16"/>
@@ -440,7 +437,6 @@
 
   <bindings>
     <binding xil_pn:location="/mojo_top" xil_pn:name="src/mojo.ucf"/>
-    <binding xil_pn:location="/mojo_top" xil_pn:name="clks.ucf"/>
   </bindings>
 
   <libraries/>
